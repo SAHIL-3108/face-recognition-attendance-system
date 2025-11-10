@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Attendance System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --success: #10b981;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 0;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+        }
+
+        .logo-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--light), #c7d2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Main Content */
+        .dashboard {
+            padding: 2rem 0;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card i {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .stat-card p {
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Face Recognition Section */
+        .face-recognition-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .face-recognition-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .recognition-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .recognition-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .recognition-card h3 i {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Camera Container */
+        .camera-container {
+            width: 100%;
+            height: 380px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid var(--glass-border);
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 18px;
+        }
+
+        .camera-placeholder {
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .camera-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .recognition-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Attendance List */
+        .attendance-list {
+            margin-top: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .attendance-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .attendance-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .attendance-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .attendance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .attendance-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .employee-info h4 {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .employee-info p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .time-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .time {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .status {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-present {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-late {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-absent {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Employee Management */
+        .employee-management {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            color: var(--primary);
+            font-size: 2rem;
+        }
+
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .employee-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .employee-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .employee-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .employee-details h3 {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .employee-details p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .employee-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .employee-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--gray);
+        }
+
+        /* Settings */
+        .settings-page {
+            display: none;
+            padding: 2rem 0;
+        }
+
+        .settings-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .settings-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .settings-section h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--light);
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .recognition-controls {
+                flex-direction: column;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>Face Attendance</h1>
+                        <p>Smart Attendance System</p>
+                    </div>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-active" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="#" data-page="employeeManagement"><i class="fas fa-users"></i> Employees</a>
+                    <a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Dashboard Page -->
+    <main class="dashboard" id="dashboardPage">
+        <div class="container">
+            <!-- Stats Cards -->
+            <section class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="totalEmployees">0</h3>
+                            <p>Total Employees</p>
+                        </div>
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="totalPresent">0</h3>
+                            <p>Present Today</p>
+                        </div>
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="totalLate">0</h3>
+                            <p>Late Today</p>
+                        </div>
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <h3 id="totalAbsent">0</h3>
+                            <p>Absent Today</p>
+                        </div>
+                        <i class="fas fa-user-times"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alert Messages -->
+            <div class="alert alert-success" id="successAlert" style="display: none;">
+                <i class="fas fa-check-circle"></i>
+                <span id="successMessage"></span>
+            </div>
+            <div class="alert alert-error" id="errorAlert" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="errorMessage"></span>
+            </div>
+
+            <!-- Face Recognition Section -->
+            <section class="face-recognition-section">
+                <!-- Face Recognition Card -->
+                <div class="recognition-card">
+                    <h3><i class="fas fa-camera"></i> Face Recognition</h3>
+                    <div class="camera-container">
+                        <img id="videoFeed" class="camera-feed" style="display: none;">
+                        <div class="camera-placeholder" id="cameraPlaceholder">
+                            <i class="fas fa-camera"></i>
+                            <p>Camera feed will appear here</p>
+                        </div>
+                    </div>
+                    <div class="recognition-controls">
+                        <button class="btn btn-primary" id="startCamera">
+                            <i class="fas fa-play"></i> Start Camera
+                        </button>
+                        <button class="btn btn-success" id="startRecognition" style="display: none;">
+                            <i class="fas fa-play-circle"></i> Start Recognition
+                        </button>
+                        <button class="btn btn-danger" id="stopRecognition" style="display: none;">
+                            <i class="fas fa-stop"></i> Stop Recognition
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Today's Attendance Card -->
+                <div class="recognition-card">
+                    <h3><i class="fas fa-clipboard-list"></i> Today's Attendance</h3>
+                    <div class="attendance-list" id="todayAttendanceList">
+                        <div class="spinner"></div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="exportAttendance" style="margin-top: 15px;">
+                        <i class="fas fa-download"></i> Export Attendance
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Employee Management Page -->
+    <div class="employee-management" id="employeeManagementPage">
+        <div class="container">
+            <div class="page-header">
+                <h2 class="page-title">Employee Management</h2>
+                <button class="btn btn-primary" id="addEmployeeBtn">
+                    <i class="fas fa-plus"></i> Add Employee
+                </button>
+            </div>
+
+            <div class="employee-grid" id="employeeGrid">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Page -->
+    <div class="settings-page" id="settingsPage">
+        <div class="container">
+            <div class="settings-card">
+                <div class="settings-section">
+                    <h3><i class="fas fa-clock"></i> Late Time Configuration</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="lateTimeHour">Hour</label>
+                            <select id="lateTimeHour" class="form-control">
+                                <!-- Hours will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lateTimeMinute">Minute</label>
+                            <select id="lateTimeMinute" class="form-control">
+                                <!-- Minutes will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="saveLateTime">
+                        <i class="fas fa-save"></i> Save Late Time
+                    </button>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-database"></i> System Information</h3>
+                    <div id="systemInfo">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3><i class="fas fa-download"></i> Data Export</h3>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" id="exportWeekData">
+                            <i class="fas fa-file-excel"></i> Export Week Data
+                        </button>
+                        <button class="btn btn-danger" id="exportAllData">
+                            <i class="fas fa-file-archive"></i> Export All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Contact Support</a>
+                </div>
+                <div class="copyright">
+                    &copy; 2024 Face Attendance System. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Employee Modal -->
+    <div class="modal" id="addEmployeeModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="settings-card" style="max-width: 500px; margin: 20px;">
+            <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="color: var(--primary); margin: 0;">Add New Employee</h3>
+                <button class="close-modal" style="background: none; border: none; color: var(--gray); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            <form id="addEmployeeForm">
+                <div class="form-group">
+                    <label for="employeeName">Full Name</label>
+                    <input type="text" id="employeeName" class="form-control" placeholder="Enter employee name" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeId">Employee ID</label>
+                    <input type="text" id="employeeId" class="form-control" placeholder="Enter employee ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeePhoto">Upload Face Photo</label>
+                    <input type="file" id="employeePhoto" class="form-control" accept="image/*" required>
+                    <small style="color: var(--gray); display: block; margin-top: 5px;">Upload a clear frontal face photo for registration</small>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-danger close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Employee</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Backend API Base URL
+        const API_BASE = 'http://localhost:5000';
+
+        // Global state
+        let recognitionActive = false;
+        let currentPage = 'dashboard';
+
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            const alertEl = type === 'success' ? document.getElementById('successAlert') : document.getElementById('errorAlert');
+            const messageEl = type === 'success' ? document.getElementById('successMessage') : document.getElementById('errorMessage');
+            
+            messageEl.textContent = message;
+            alertEl.style.display = 'flex';
+            
+            setTimeout(() => {
+                alertEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function formatTime(dateString) {
+            if (!dateString) return '--:--';
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // API Functions
+        async function apiCall(endpoint, options = {}) {
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    },
+                    ...options
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                showAlert(`API Error: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        // Data fetching functions
+        async function fetchDashboardData() {
+            try {
+                const [attendance, employees, health] = await Promise.all([
+                    apiCall('/attendance'),
+                    apiCall('/employees'),
+                    apiCall('/health')
+                ]);
+
+                // Update stats
+                document.getElementById('totalEmployees').textContent = employees.length;
+                
+                const presentCount = attendance.filter(a => a.status === 'present').length;
+                const lateCount = attendance.filter(a => a.status === 'late').length;
+                const absentCount = employees.length - presentCount - lateCount;
+                
+                document.getElementById('totalPresent').textContent = presentCount;
+                document.getElementById('totalLate').textContent = lateCount;
+                document.getElementById('totalAbsent').textContent = Math.max(0, absentCount);
+
+                // Update attendance list
+                updateAttendanceList(attendance);
+
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        }
+
+        async function fetchEmployees() {
+            try {
+                const employees = await apiCall('/employees');
+                updateEmployeeGrid(employees);
+            } catch (error) {
+                console.error('Error fetching employees:', error);
+            }
+        }
+
+        async function fetchSystemInfo() {
+            try {
+                const info = await apiCall('/debug_data');
+                updateSystemInfo(info);
+            } catch (error) {
+                console.error('Error fetching system info:', error);
+            }
+        }
+
+        // Update UI functions
+        function updateAttendanceList(attendance) {
+            const container = document.getElementById('todayAttendanceList');
+            
+            if (attendance.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray);">No attendance records today</p>';
+                return;
+            }
+
+            container.innerHTML = attendance.map(record => `
+                <div class="attendance-item">
+                    <div class="user-details">
+                        <div class="user-avatar">${record.name.split(' ').map(n => n[0]).join('').toUpperCase()}</div>
+                        <div class="employee-info">
+                            <h4>${record.name}</h4>
+                            <p>${record.location || 'Main Entrance'}</p>
+                        </div>
+                    </div>
+                    <div class="time-status">
+                        <div class="time">${formatTime(record.check_in)}</div>
+                        <div class="status status-${record.status === 'late' ? 'late' : 'present'}">${record.status}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateEmployeeGrid(employees) {
+            const container = document.getElementById('employeeGrid');
+            
+            if (employees.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray); grid-column: 1 / -1;">No employees registered</p>';
+                return;
+            }
+
+            container.innerHTML = employees.map(emp => `
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <div class="employee-avatar">${emp.name.split(' ').map(n => n[0]).join('').toUpperCase()}</div>
+                        <div class="employee-details">
+                            <h3>${emp.name}</h3>
+                            <p>${emp.employee_id}</p>
+                        </div>
+                    </div>
+                    <div class="employee-info-item">
+                        <span class="info-label">Last Check-in:</span>
+                        <span>${emp.last_check_in ? formatTime(emp.last_check_in) : 'Never'}</span>
+                    </div>
+                    <div class="employee-info-item">
+                        <span class="info-label">Status Today:</span>
+                        <span class="status status-${emp.checked_in_today ? (emp.is_late_today ? 'late' : 'present') : 'absent'}">
+                            ${emp.checked_in_today ? (emp.is_late_today ? 'Late' : 'Present') : 'Absent'}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateSystemInfo(info) {
+            const container = document.getElementById('systemInfo');
+            
+            container.innerHTML = `
+                <div class="employee-info-item">
+                    <span class="info-label">Total Users:</span>
+                    <span>${info.database?.database_info?.total_users || 0}</span>
+                </div>
+                <div class="employee-info-item">
+                    <span class="info-label">Total Records:</span>
+                    <span>${info.database?.database_info?.total_attendance_records || 0}</span>
+                </div>
+                <div class="employee-info-item">
+                    <span class="info-label">Today's Records:</span>
+                    <span>${info.database?.database_info?.today_attendance || 0}</span>
+                </div>
+                <div class="employee-info-item">
+                    <span class="info-label">Known Faces:</span>
+                    <span>${info.face_recognition?.known_faces || 0}</span>
+                </div>
+                <div class="employee-info-item">
+                    <span class="info-label">Camera Status:</span>
+                    <span>${info.camera?.camera_available ? 'Available' : 'Unavailable'}</span>
+                </div>
+            `;
+        }
+
+        // Camera and Recognition functions
+        function startCamera() {
+            const videoFeed = document.getElementById('videoFeed');
+            const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+            
+            videoFeed.src = `${API_BASE}/video_feed`;
+            videoFeed.style.display = 'block';
+            cameraPlaceholder.style.display = 'none';
+            
+            document.getElementById('startCamera').style.display = 'none';
+            document.getElementById('startRecognition').style.display = 'block';
+        }
+
+        async function startRecognition() {
+            try {
+                await apiCall('/start_recognition');
+                recognitionActive = true;
+                document.getElementById('startRecognition').style.display = 'none';
+                document.getElementById('stopRecognition').style.display = 'block';
+                showAlert('Face recognition started successfully');
+            } catch (error) {
+                showAlert('Failed to start recognition', 'error');
+            }
+        }
+
+        async function stopRecognition() {
+            try {
+                await apiCall('/stop_recognition');
+                recognitionActive = false;
+                document.getElementById('stopRecognition').style.display = 'none';
+                document.getElementById('startRecognition').style.display = 'block';
+                showAlert('Face recognition stopped');
+            } catch (error) {
+                showAlert('Failed to stop recognition', 'error');
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate late time dropdowns
+            const hourSelect = document.getElementById('lateTimeHour');
+            const minuteSelect = document.getElementById('lateTimeMinute');
+            
+            for (let i = 0; i < 24; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i.toString().padStart(2, '0');
+                hourSelect.appendChild(option);
+            }
+            
+            for (let i = 0; i < 60; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i.toString().padStart(2, '0');
+                minuteSelect.appendChild(option);
+            }
+
+            // Load current late time
+            apiCall('/get_late_time').then(data => {
+                hourSelect.value = data.hour;
+                minuteSelect.value = data.minute;
+            });
+
+            // Navigation
+            const navLinks = document.querySelectorAll('.nav-links a[data-page]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('nav-active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('nav-active');
+                    
+                    // Hide all pages
+                    document.getElementById('dashboardPage').style.display = 'none';
+                    document.getElementById('employeeManagementPage').style.display = 'none';
+                    document.getElementById('settingsPage').style.display = 'none';
+                    
+                    // Show selected page
+                    const page = this.getAttribute('data-page');
+                    currentPage = page;
+                    
+                    document.getElementById(`${page}Page`).style.display = 'block';
+                    
+                    // Load page-specific data
+                    if (page === 'dashboard') {
+                        fetchDashboardData();
+                    } else if (page === 'employeeManagement') {
+                        fetchEmployees();
+                    } else if (page === 'settings') {
+                        fetchSystemInfo();
+                    }
+                });
+            });
+
+            // Camera controls
+            document.getElementById('startCamera').addEventListener('click', startCamera);
+            document.getElementById('startRecognition').addEventListener('click', startRecognition);
+            document.getElementById('stopRecognition').addEventListener('click', stopRecognition);
+
+            // Employee management
+            document.getElementById('addEmployeeBtn').addEventListener('click', function() {
+                document.getElementById('addEmployeeModal').style.display = 'flex';
+            });
+
+            // Modal functionality
+            const modal = document.getElementById('addEmployeeModal');
+            const closeButtons = document.querySelectorAll('.close-modal');
+            
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                });
+            });
+
+            // Add employee form
+            document.getElementById('addEmployeeForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData();
+                formData.append('name', document.getElementById('employeeName').value);
+                formData.append('employee_id', document.getElementById('employeeId').value);
+                formData.append('image', document.getElementById('employeePhoto').files[0]);
+                
+                try {
+                    const response = await fetch(`${API_BASE}/register_face`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showAlert(result.message);
+                        modal.style.display = 'none';
+                        this.reset();
+                        fetchEmployees();
+                        fetchDashboardData();
+                    } else {
+                        showAlert(result.message, 'error');
+                    }
+                } catch (error) {
+                    showAlert('Failed to add employee', 'error');
+                }
+            });
+
+            // Settings
+            document.getElementById('saveLateTime').addEventListener('click', async function() {
+                const hour = document.getElementById('lateTimeHour').value;
+                const minute = document.getElementById('lateTimeMinute').value;
+                
+                try {
+                    const result = await apiCall('/set_late_time', {
+                        method: 'POST',
+                        body: JSON.stringify({ hour: parseInt(hour), minute: parseInt(minute) })
+                    });
+                    
+                    if (result.success) {
+                        showAlert(result.message);
+                    }
+                } catch (error) {
+                    showAlert('Failed to save late time', 'error');
+                }
+            });
+
+            // Export functionality
+            document.getElementById('exportAttendance').addEventListener('click', function() {
+                window.open(`${API_BASE}/export_attendance?range=week`, '_blank');
+            });
+
+            document.getElementById('exportWeekData').addEventListener('click', function() {
+                window.open(`${API_BASE}/export_attendance?range=week`, '_blank');
+            });
+
+            document.getElementById('exportAllData').addEventListener('click', function() {
+                window.open(`${API_BASE}/export_attendance?range=all`, '_blank');
+            });
+
+            // Load initial data
+            fetchDashboardData();
+
+            // Auto-refresh dashboard every 30 seconds
+            setInterval(() => {
+                if (currentPage === 'dashboard') {
+                    fetchDashboardData();
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
